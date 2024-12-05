@@ -1,10 +1,10 @@
 {
-  "name": "create-graphai-agent.git",
-  "version": "0.0.1",
+  "name": "create-graphai-agent",
+  "version": "0.0.3",
   "description": "",
   "main": "lib/index.js",
   "bin": {
-    "create-vue": "./lib/index.js"
+    "create-graphai-agent": "./lib/index.js"
   },
   "files": [
     "./lib"
