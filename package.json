@@ -1,8 +1,11 @@
 {
-  "name": "ts-template",
+  "name": "create-graphai-agent.git",
   "version": "0.0.1",
   "description": "",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "bin": {
+    "create-vue": "./lib/index.js"
+  },
   "files": [
     "./lib"
   ],
@@ -10,6 +13,7 @@
     "build": "tsc && tsc-alias",
     "eslint": "eslint src --fix",
     "format": "prettier --write '{src,tests}/**/*.ts'",
+    "run": "npx ts-node src/index.ts",
     "test": "node --test --require ts-node/register ./tests/test_*.ts"
   },
   "repository": {
