@@ -2,6 +2,13 @@
 
 GraphAIのagentをgeneratorを使って作ります。
 
+コマンドは以下。
+```
+npm create graphai-agent@latest
+```
+
+実行するとこのようになります。
+
 ```
 $ npm create graphai-agent@latest
 Need to install the following packages:
