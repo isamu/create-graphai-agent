@@ -17,11 +17,11 @@ const templateAgentInfo: AgentFunctionInfo = {
       namedInputs: {b: "2"},
     },
   }],
-  description: "Template Agent",
-  category: ["template"],
-  author: "Receptron team",
-  repository: "https://github.com/receptron/graphai",
-  license: "MIT",
+  description: "AgentDescription",
+  category: ["AgentCategory"],
+  author: "AgentAuthor",
+  repository: "AgentRepository",
+  license: "LICENSE",
 };
 
 export default templateAgentInfo;

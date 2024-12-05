@@ -39,7 +39,21 @@ const mkdir = (path: string) => {
     fs.mkdirSync(path);
   }
 };
+
+const npmLatestVersion = async (name: string) => {
+  const res = await fetch("https://registry.npmjs.org/" + name);
+  const body = await res.json();
+  return body["dist-tags"]["latest"];
+  return res;
+};
+
 const main = async () => {
+  const [graphAI_latest, vanilla_latest, test_utils_latest] = await Promise.all([
+    npmLatestVersion("graphai"),
+    npmLatestVersion("@graphai/vanilla"),
+    npmLatestVersion("@receptron/test_utils"),
+  ]);
+
   const defaultProjectName = "graphai-agent";
   const result = await prompts([
     {
@@ -48,10 +62,53 @@ const main = async () => {
       message: "agent name",
       initial: defaultProjectName,
     },
+    {
+      name: "description",
+      type: "text",
+      message: "agent description",
+      initial: "",
+    },
+    {
+      name: "author",
+      type: "text",
+      message: "author name",
+      initial: "YOU", // TODO
+    },
+    {
+      name: "license",
+      type: "text",
+      message: "license",
+      initial: "MIT",
+    },
+    {
+      name: "category",
+      type: "text",
+      message: "agent category",
+      initial: "",
+    },
+    {
+      name: "repository",
+      type: "text",
+      message: "repository",
+      initial: "https://github.com/receptron/graphai/",
+    },
   ]);
+  /*
+  cacheType
+  environmentVariables
+  stream
+  apiKeys
+*/
+
   const cwd = process.cwd();
 
   const agentName = result["agentName"].trim();
+
+  const description = result["description"];
+  const author = result["author"];
+  const license = result["license"];
+  const category = result["category"];
+  const repository = result["repository"];
 
   // agentName, file_name, agent-name
   const { lowerCamelCase, snakeCase, kebabCase } = convertToLowerCamelCaseAndSnakeCase(agentName);
@@ -67,11 +124,30 @@ const main = async () => {
 
   // source
   const src = fs.readFileSync(path.resolve(__dirname, "..", "template", "src", "template_agent.ts"), "utf8");
-  fs.writeFileSync(path.resolve(root, "src", snakeCase + ".ts"), src.replaceAll("templateAgent", lowerCamelCase));
+  fs.writeFileSync(
+    path.resolve(root, "src", snakeCase + ".ts"),
+    src
+      .replaceAll("templateAgent", lowerCamelCase)
+      .replaceAll("AgentDescription", description)
+      .replaceAll("AgentCategory", category)
+      .replaceAll("AgentAuthor", author)
+      .replaceAll("AgentRepository", repository)
+      .replaceAll("LICENSE", license),
+  );
 
   // packages
   const packageFile = fs.readFileSync(path.resolve(__dirname, "..", "template", "package.json"), "utf8");
-  fs.writeFileSync(path.resolve(root, "package.json"), packageFile.replaceAll("@graphai/agent_template", snakeCase));
+  const packageJson = JSON.parse(packageFile);
+  packageJson.name = snakeCase;
+  packageJson.description = description;
+  packageJson.author = author;
+  packageJson.license = license;
+  packageJson.devDependencies = {
+    "@receptron/test_utils": "^" + test_utils_latest,
+    "@graphai/vanilla": "^" + vanilla_latest,
+    graphai: "^" + graphAI_latest,
+  };
+  fs.writeFileSync(path.resolve(root, "package.json"), JSON.stringify(packageJson, null, 2));
 
   // index
   fs.writeFileSync(
