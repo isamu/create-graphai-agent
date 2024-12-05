@@ -1,0 +1,26 @@
+{
+  "name": "@graphai/agent_template",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "files": [
+    "./lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "eslint": "eslint src --fix",
+    "format": "prettier --write '{src,tests}/**/*.ts'",
+    "doc": "npx agentdoc",
+    "test_run": "node --test --require ts-node/register ./tests/run_*.ts",
+    "test": "node --test --require ts-node/register ./tests/test_*.ts",
+    "ci": "yarn run format && yarn run eslint && yarn run test && yarn run build"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@receptron/test_utils": "^0.2.2",
+    "@graphai/vanilla": "0.2.2",
+    "graphai": "0.6.2"
+  },
+  "dependencies": {}
+}
