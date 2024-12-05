@@ -48,10 +48,11 @@ const npmLatestVersion = async (name: string) => {
 };
 
 const main = async () => {
-  const [graphAI_latest, vanilla_latest, test_utils_latest] = await Promise.all([
+  const [graphAI_latest, vanilla_latest, test_utils_latest, agentdoc_latest] = await Promise.all([
     npmLatestVersion("graphai"),
     npmLatestVersion("@graphai/vanilla"),
     npmLatestVersion("@receptron/test_utils"),
+    npmLatestVersion("@receptron/agentdoc"),
   ]);
 
   const defaultProjectName = "graphai-agent";
@@ -142,8 +143,9 @@ const main = async () => {
   packageJson.description = description;
   packageJson.author = author;
   packageJson.license = license;
-  packageJson.devDependencies["@receptron/test_utils"] = "^" + test_utils_latest;
   packageJson.devDependencies["@graphai/vanilla"] = "^" + vanilla_latest;
+  packageJson.devDependencies["@receptron/agentdoc"] = "^" + agentdoc_latest;
+  packageJson.devDependencies["@receptron/test_utils"] = "^" + test_utils_latest;
   packageJson.devDependencies["graphai"] = "^" + graphAI_latest;
   
   fs.writeFileSync(path.resolve(root, "package.json"), JSON.stringify(packageJson, null, 2));
