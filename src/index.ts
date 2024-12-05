@@ -3,7 +3,7 @@ import * as path from 'node:path'
 
 const main = () => {
   const cwd = process.cwd()
-  const targetDir = "123";
+  const targetDir = "graphai-agent";
   const root = path.join(cwd, targetDir)
 
   if (!fs.existsSync(root)) {
