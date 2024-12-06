@@ -15,45 +15,54 @@ const textArgs = [
     alias: "n",
     description: "agent name",
     default: defaultProjectName,
-  }, {
+  },
+  {
     name: "description",
     description: "",
     default: "this is agent",
-  }, {
+  },
+  {
     name: "author",
     description: "your name",
     default: "ai",
-  }, {
+  },
+  {
     name: "license",
     description: "license",
     default: "MIT",
-  }, {
+  },
+  {
     name: "category",
     description: "agent cagtegory",
     default: "general",
-  }, {
+  },
+  {
     name: "repository",
     description: "git repository url",
     default: "https://github.com/receptron/graphai/",
-  }];
+  },
+];
 //
 export const args = (() => {
-  const ret = yargs
-        .scriptName("npm create graphai-agent")
-        .option("noninteractive", {
-          alias: "c",
-          description: "non interactive",
-          default: false,
-          type: "boolean",
-        });
-  textArgs.forEach(opt => {
+  const ret = yargs.scriptName("npm create graphai-agent").option("noninteractive", {
+    alias: "c",
+    description: "non interactive",
+    default: false,
+    type: "boolean",
+  });
+  textArgs.forEach((opt) => {
     ret.option(opt.name, {
       description: opt.description,
       default: opt.default,
       type: "string",
-    })
+    });
   });
-  return ret.parseSync()
+  ret.option("outdir", {
+    description: "output_dir",
+    demandOption: false,
+    type: "string",
+  });
+  return ret.parseSync();
 })();
 //
 
@@ -107,7 +116,6 @@ const main = async () => {
     npmLatestVersion("@receptron/agentdoc"),
   ]);
 
-
   const result = await (async () => {
     if (args.noninteractive) {
       return args;
@@ -137,7 +145,7 @@ const main = async () => {
   apiKeys
 */
 
-  const cwd = process.cwd();
+  const cwd = result["outdir"] ? result["outdir"] : process.cwd();
 
   const agentName = result["agentName"].trim();
 
@@ -148,7 +156,7 @@ const main = async () => {
   const repository = result["repository"];
 
   console.log(result);
-  
+
   // agentName, file_name, agent-name
   const { lowerCamelCase, snakeCase, kebabCase } = convertToLowerCamelCaseAndSnakeCase(agentName);
   const root = path.join(cwd, kebabCase);
@@ -185,7 +193,7 @@ const main = async () => {
   packageJson.devDependencies["@receptron/agentdoc"] = "^" + agentdoc_latest;
   packageJson.devDependencies["@receptron/test_utils"] = "^" + test_utils_latest;
   packageJson.devDependencies["graphai"] = "^" + graphAI_latest;
-  
+
   fs.writeFileSync(path.resolve(root, "package.json"), JSON.stringify(packageJson, null, 2));
 
   // index
