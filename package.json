@@ -1,6 +1,6 @@
 {
   "name": "create-graphai-agent",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "",
   "main": "lib/index.js",
   "bin": {
@@ -28,11 +28,13 @@
   },
   "homepage": "https://github.com/isamu/ts-template#readme",
   "dependencies": {
-    "prompts": "^2.4.2"
+    "prompts": "^2.4.2",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
     "@types/prompts": "^2.4.9",
+    "@types/yargs": "^17.0.33",
     "eslint": "^9.14.0",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",

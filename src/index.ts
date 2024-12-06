@@ -3,7 +3,59 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+import yargs from "yargs";
+
 import prompts from "prompts";
+
+const defaultProjectName = "graphai-agent";
+
+const textArgs = [
+  {
+    name: "agentName",
+    alias: "n",
+    description: "agent name",
+    default: defaultProjectName,
+  }, {
+    name: "description",
+    description: "",
+    default: "this is agent",
+  }, {
+    name: "author",
+    description: "your name",
+    default: "ai",
+  }, {
+    name: "license",
+    description: "license",
+    default: "MIT",
+  }, {
+    name: "category",
+    description: "agent cagtegory",
+    default: "general",
+  }, {
+    name: "repository",
+    description: "git repository url",
+    default: "https://github.com/receptron/graphai/",
+  }];
+//
+export const args = (() => {
+  const ret = yargs
+        .scriptName("npm create graphai-agent")
+        .option("noninteractive", {
+          alias: "c",
+          description: "non interactive",
+          default: false,
+          type: "boolean",
+        });
+  textArgs.forEach(opt => {
+    ret.option(opt.name, {
+      description: opt.description,
+      default: opt.default,
+      type: "string",
+    })
+  });
+  return ret.parseSync()
+})();
+//
 
 const copyFile = (root: string, file: string) => {
   const templateDir = path.resolve(__dirname, "..", "template");
@@ -55,45 +107,29 @@ const main = async () => {
     npmLatestVersion("@receptron/agentdoc"),
   ]);
 
-  const defaultProjectName = "graphai-agent";
-  const result = await prompts([
-    {
-      name: "agentName",
-      type: "text",
-      message: "agent name",
-      initial: defaultProjectName,
-    },
-    {
-      name: "description",
-      type: "text",
-      message: "agent description",
-      initial: "",
-    },
-    {
-      name: "author",
-      type: "text",
-      message: "author name",
-      initial: "YOU", // TODO
-    },
-    {
-      name: "license",
-      type: "text",
-      message: "license",
-      initial: "MIT",
-    },
-    {
-      name: "category",
-      type: "text",
-      message: "agent category",
-      initial: "",
-    },
-    {
-      name: "repository",
-      type: "text",
-      message: "repository",
-      initial: "https://github.com/receptron/graphai/",
-    },
-  ]);
+
+  const result = await (async () => {
+    if (args.noninteractive) {
+      return args;
+      /*
+      textArgs.forEach(opt => {
+        console.log(opt.name);
+        console.log(args[opt.name])
+      });
+      console.log(args.agentName);
+      */
+    } else {
+      const promptsArg = textArgs.map((opt) => {
+        return {
+          name: opt.name,
+          type: "text" as const,
+          message: opt.description,
+          initial: opt.default,
+        };
+      });
+      return await prompts(promptsArg);
+    }
+  })();
   /*
   cacheType
   environmentVariables
@@ -111,6 +147,8 @@ const main = async () => {
   const category = result["category"];
   const repository = result["repository"];
 
+  console.log(result);
+  
   // agentName, file_name, agent-name
   const { lowerCamelCase, snakeCase, kebabCase } = convertToLowerCamelCaseAndSnakeCase(agentName);
   const root = path.join(cwd, kebabCase);
