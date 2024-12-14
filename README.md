@@ -74,3 +74,12 @@ npm publish  --access=public
 
 Then, you will be able to use the agent from graphai with the npm package.
 
+## options
+
+### -f filename
+
+Generate a single TypeScript file for the agent instead of a package.
+
+### -s (simple mode)
+
+Make the package.json file simple, primarily for use in a monorepo.

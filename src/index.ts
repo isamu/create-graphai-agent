@@ -44,12 +44,26 @@ const textArgs = [
 ];
 //
 export const args = (() => {
-  const ret = yargs.scriptName("npm create graphai-agent").option("noninteractive", {
-    alias: "c",
-    description: "non interactive",
-    default: false,
-    type: "boolean",
-  });
+  const ret = yargs
+    .scriptName("npm create graphai-agent")
+    .option("noninteractive", {
+      alias: "c",
+      description: "non interactive",
+      default: false,
+      type: "boolean",
+    })
+    .option("simple", {
+      alias: "s",
+      description: "simple package",
+      default: false,
+      type: "boolean",
+    })
+    .option("file", {
+      alias: "f",
+      description: "just output file",
+      default: false,
+      type: "string",
+    });
   textArgs.forEach((opt) => {
     ret.option(opt.name, {
       description: opt.description,
@@ -116,16 +130,12 @@ const main = async () => {
     npmLatestVersion("@receptron/agentdoc"),
   ]);
 
+  const simpleMode = args.simple;
+  const justFile = args.file;
+
   const result = await (async () => {
     if (args.noninteractive) {
       return args;
-      /*
-      textArgs.forEach(opt => {
-        console.log(opt.name);
-        console.log(args[opt.name])
-      });
-      console.log(args.agentName);
-      */
     } else {
       const promptsArg = textArgs.map((opt) => {
         return {
@@ -143,7 +153,7 @@ const main = async () => {
   environmentVariables
   stream
   apiKeys
-*/
+  */
 
   const cwd = result["outdir"] ? result["outdir"] : process.cwd();
 
@@ -155,12 +165,32 @@ const main = async () => {
   const category = result["category"];
   const repository = result["repository"];
 
-  console.log(result);
-
   // agentName, file_name, agent-name
   const { lowerCamelCase, snakeCase, kebabCase } = convertToLowerCamelCaseAndSnakeCase(agentName);
   const root = path.join(cwd, kebabCase);
 
+  const writeAgentSrc = (filePath: string) => {
+    // source
+    const src = fs.readFileSync(path.resolve(__dirname, "..", "template", "src", "template_agent.ts"), "utf8");
+    fs.writeFileSync(
+      filePath,
+      src
+        .replaceAll("templateAgent", lowerCamelCase)
+        .replaceAll("AgentDescription", description)
+        .replaceAll("AgentCategory", category)
+        .replaceAll("AgentAuthor", author)
+        .replaceAll("AgentRepository", repository)
+        .replaceAll("LICENSE", license),
+    );
+  };
+
+  if (justFile && typeof justFile === "string") {
+    console.log(path.resolve(cwd, justFile));
+    writeAgentSrc(path.resolve(cwd, justFile));
+    return;
+  }
+
+  // create package
   mkdir(root);
   mkdir(path.resolve(root, "src"));
   mkdir(path.resolve(root, "tests"));
@@ -169,21 +199,11 @@ const main = async () => {
   copyFile(root, "tsconfig.json");
   copyFile(root, "tests/test_agent_runner.ts");
 
-  // source
-  const src = fs.readFileSync(path.resolve(__dirname, "..", "template", "src", "template_agent.ts"), "utf8");
-  fs.writeFileSync(
-    path.resolve(root, "src", snakeCase + ".ts"),
-    src
-      .replaceAll("templateAgent", lowerCamelCase)
-      .replaceAll("AgentDescription", description)
-      .replaceAll("AgentCategory", category)
-      .replaceAll("AgentAuthor", author)
-      .replaceAll("AgentRepository", repository)
-      .replaceAll("LICENSE", license),
-  );
+  writeAgentSrc(path.resolve(root, "src", snakeCase + ".ts"));
 
   // packages
-  const packageFile = fs.readFileSync(path.resolve(__dirname, "..", "template", "package.json"), "utf8");
+  const basePackageFileName = simpleMode ? "package-simple.json" : "package.json";
+  const packageFile = fs.readFileSync(path.resolve(__dirname, "..", "template", basePackageFileName), "utf8");
   const packageJson = JSON.parse(packageFile);
   packageJson.name = snakeCase;
   packageJson.description = description;
