@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/create-graphai-agent.svg)](https://badge.fury.io/js/create-graphai-agent)
 # create-graphai-agent
 
 
