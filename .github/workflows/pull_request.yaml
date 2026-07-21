@@ -1,0 +1,38 @@
+# Minimal Node.js CI — runs lint / build / test on pull_request + push
+# to main. Modeled on the mulmocast-cli pattern (single job matrix,
+# yarn cache, no OS matrix).
+
+name: Node.js CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint_test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
+    steps:
+    - uses: actions/checkout@v5
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'yarn'
+    - name: Cache node_modules
+      uses: actions/cache@v5
+      with:
+        path: node_modules
+        key: node-modules-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
+    - run: yarn install --frozen-lockfile
+    - run: yarn run build
+    - run: yarn run test
