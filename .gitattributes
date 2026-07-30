@@ -1,0 +1,4 @@
+# Force LF in the working tree on every platform so the eslint
+# `linebreak-style: unix` rule passes on Windows CI (git would otherwise
+# convert LF -> CRLF on checkout via core.autocrlf).
+* text=auto eol=lf
