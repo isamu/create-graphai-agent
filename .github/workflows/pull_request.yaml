@@ -1,6 +1,7 @@
-# Minimal Node.js CI — runs lint / build / test on pull_request + push
-# to main. Modeled on the mulmocast-cli pattern (single job matrix,
-# yarn cache, no OS matrix).
+# Node.js CI — runs lint / typecheck / build / test on pull_request +
+# push to main. create-graphai-agent ships to npm, so the matrix covers
+# all three OSes (ubuntu / macos / windows) to catch node:path / node:url
+# and path-separator portability issues in the scaffolding CLI.
 
 name: Node.js CI
 
@@ -17,22 +18,29 @@ permissions:
 
 jobs:
   lint_test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    # bash on every OS so the test-glob (./tests/test_*.ts) expands
+    # identically — Windows runners default to pwsh, which does not.
+    defaults:
+      run:
+        shell: bash
     strategy:
+      fail-fast: false
       matrix:
         node-version: [22.x, 24.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
+      with:
+        persist-credentials: false
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v5
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
-    - name: Cache node_modules
-      uses: actions/cache@v5
-      with:
-        path: node_modules
-        key: node-modules-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
     - run: yarn install --frozen-lockfile
+    - run: yarn run lint
+    - run: yarn run typecheck
     - run: yarn run build
     - run: yarn run test
