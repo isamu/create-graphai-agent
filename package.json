@@ -32,21 +32,21 @@
   "homepage": "https://github.com/isamu/ts-template#readme",
   "dependencies": {
     "prompts": "^2.4.2",
-    "yargs": "^17.7.2"
+    "yargs": "^18.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/prompts": "^2.4.9",
     "@types/yargs": "^17.0.33",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
-    "knip": "^6.41.0",
-    "prettier": "^3.9.10",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "knip": "^6.48.0",
+    "prettier": "^3.10.1",
     "ts-node": "^10.9.2",
-    "tsc-alias": "^1.9.8",
+    "tsc-alias": "^1.9.10",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.2"
+    "typescript-eslint": "^8.74.0"
   },
   "types": "./lib/index.d.ts",
   "directories": {
